@@ -1,0 +1,27 @@
+{
+  "name": "execrot/social-provider",
+  "type": "library",
+  "description": "Social OAuth and data provider",
+  "keywords": ["vk", "vk.com", "facebook", "facebook.com", "api", "oauth"],
+  "support": {
+    "email": "execrot@gmail.com"
+  },
+  "require": {
+    "php"                 : ">=5.4",
+    "ext-curl"            : "*",
+    "facebook/php-sdk-v4" : "4.0.*"
+  },
+  "authors": [
+    {
+      "name": "Edward Komissarov",
+      "email": "execrot@gmail.com"
+    },
+    {
+      "name": "Vlad Pronsky",
+      "email": "vladkens@yandex.ru"
+    }
+  ],
+  "autoload": {
+    "psr-0": { "Social": "src/" }
+  }
+}
