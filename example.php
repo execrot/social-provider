@@ -8,7 +8,7 @@ $config = array(
         'facebook' => array(
             'id' => '{fb-app-id}',
             'secret' => '{fb-app-secret}',
-            'redirect' => '{fb-callback-url}',
+            'redirect' => '{your-site-callback-url}',
             'scope' => array(
                 '{scope1}',
                 '{scope2}',
@@ -17,8 +17,8 @@ $config = array(
         ),
         'vk' => array(
             'id' => '{vk-app-id}',
-            'secret' => '{vk-app-secret}',
-            'redirect' => '{vk-callback-url}',
+            'secret' => '{vk_app-secret}',
+            'redirect' => '{your-site-callback-url}',
             'scope' => array(
                 '{scope1}',
                 '{scope2}'
@@ -30,10 +30,8 @@ $config = array(
 session_start();
 require_once "vendor/autoload.php";
 
-$social = !empty($_GET['social'])?$_GET['social']:'facebook';
-
 \Social\Factory::setConfig($config['social']);
-$social = \Social\Factory::factory($social);
+$social = \Social\Factory::factory($_GET['social']);
 
 if (isset($_GET['code'])) {
 

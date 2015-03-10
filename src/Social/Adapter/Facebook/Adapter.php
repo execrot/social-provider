@@ -27,10 +27,6 @@ class Adapter extends AbstractAdapter
             $this->getSettings()->getId(),
             $this->getSettings()->getSecret()
         );
-
-        $this->_redirectHelper = new \Facebook\FacebookRedirectLoginHelper(
-            $this->getSettings()->getRedirect()
-        );
     }
 
     /**
@@ -38,20 +34,33 @@ class Adapter extends AbstractAdapter
      */
     public function getLoginUrl()
     {
-        return $this->_redirectHelper->getLoginUrl();
+        $this->_redirectHelper = new \Facebook\FacebookRedirectLoginHelper(
+            $this->getSettings()->getRedirect()
+        );
+
+        return $this->_redirectHelper->getLoginUrl(
+            $this->getSettings()->getScope()
+        );
     }
 
     /**
-     * @return string|bool
+     * @return \Facebook\Entities\AccessToken
+     * @throws Exception\CodeWasNotProvided
      */
     public function getAccessToken()
     {
-        $session = $this->_getSession();
-
-        if ($session) {
-            return $session->getAccessToken();
+        if (!($code = $this->getCode())) {
+            throw new Exception\CodeWasNotProvided();
         }
 
+        $accessToken = \Facebook\Entities\AccessToken::requestAccessToken(array(
+            'code' => $code,
+            'redirect_uri' => $this->getSettings()->getRedirect()
+        ));
+
+        if ($accessToken) {
+            return (string)$accessToken;
+        }
         return false;
     }
 
@@ -61,8 +70,12 @@ class Adapter extends AbstractAdapter
     public function getUserData()
     {
         try {
+            $session = new \Facebook\FacebookSession(
+                $this->getAccessToken()
+            );
+
             $request = new \Facebook\FacebookRequest(
-                $this->_getSession(), 'GET', '/me'
+                $session, 'GET', '/me'
             );
 
             $response = $request->execute();
@@ -79,21 +92,6 @@ class Adapter extends AbstractAdapter
         }
         catch (\Exception $e) {
             return false;
-        }
-    }
-
-    /**
-     * @return \Facebook\FacebookSession|null
-     * @throws Exception\SessionFailure
-     */
-    private function _getSession()
-    {
-        try {
-            $session = $this->_redirectHelper->getSessionFromRedirect();
-            return $session;
-        }
-        catch(\Facebook\FacebookSDKException $e) {
-            throw new Exception\SessionFailure();
         }
     }
 }
